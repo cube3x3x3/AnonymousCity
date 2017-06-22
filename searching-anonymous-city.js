@@ -123,11 +123,23 @@ searchCities.exec = function(outputArea, opt_input){
   }
 
   function appendHitNames(outputArea){
+    myKen = /ken$/m;
+    myCity = /si$/m;
     var nameArray = csvParse(this.responseText);
     for (var i = 0; i < nameArray.length; i++){
       tmp = new String(nameArray[i][3]); //ken
       tmp2 = new String(nameArray[i][4]); //city
-      nameArray[i][3] = han2Roman(tmp);
+      tmp = han2Roman(tmp);
+      tmp2 = han2Roman(tmp2);
+      if (myKen.test(tmp)) {
+        console.error(tmp);
+        nameArray[i].push(tmp[0].toUpperCase() + '県');
+      }
+      if (myCity.test(tmp2)) {
+        console.error(tmp2);
+        nameArray[i].push(tmp2[0].toUpperCase() + '市');
+      }
+      nameArray[i][3] = tmp;
       nameArray[i][4] = han2Roman(tmp2);
     }
     var newUL = createUL(nameArray);
@@ -137,8 +149,8 @@ searchCities.exec = function(outputArea, opt_input){
   var FILE_INDEX = 'japanese-city-name.csv';
   processFile(FILE_INDEX, appendHitNames, outputArea);
 
-
-  window.alert(convertKanaIntoRoman(hankana2zenkana('ﾋﾞﾎﾛﾁｮｳ')));
+  testChar = convertKanaIntoRoman(hankana2zenkana('ﾋﾞﾎﾛﾁｮｳ'));
+  window.alert(testChar);
   console.error(outputArea);
   var pTag = document.createElement('P');
   console.error(pTag);
