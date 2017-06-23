@@ -1,15 +1,13 @@
 var searchCities = searchCities || {};
 
 searchCities.exec = function(outputArea, opt_input){
-  
 
-
-/**
- * 半角カタカナを全角カタカナに変換
- * 
- * @param {String} str 変換したい文字列
- */
-  var hankana2zenkana = function (str) {
+  /**
+   * 半角カタカナを全角カタカナに変換
+   * 
+   * @param {String} str 変換したい文字列
+   */
+  var hankanaToZenkana = function (str) {
     var kanaMap = {
         'ｶﾞ': 'ガ', 'ｷﾞ': 'ギ', 'ｸﾞ': 'グ', 'ｹﾞ': 'ゲ', 'ｺﾞ': 'ゴ',
         'ｻﾞ': 'ザ', 'ｼﾞ': 'ジ', 'ｽﾞ': 'ズ', 'ｾﾞ': 'ゼ', 'ｿﾞ': 'ゾ',
@@ -41,16 +39,6 @@ searchCities.exec = function(outputArea, opt_input){
             .replace(/ﾟ/g, '゜');
   };
 
-  function createUL(list){
-    var newUL = document.createElement("ul");
-    for (var i = 0; i < list.length; i++){
-      var li = document.createElement("li");
-      li.textContent = list[i];
-      newUL.appendChild(li);
-    }
-    return newUL;
-  }
-  
   //Convert kana into Roman characters.
   var convertKanaIntoRoman = function (str) {
     var romanTable = {
@@ -85,9 +73,22 @@ searchCities.exec = function(outputArea, opt_input){
             .replace(reg, function (match) {
                 return romanTable[match];
             })
-            .replace(/ッ/g, 'tsu')
-            .replace(/ﾟ/g, '゜');
+            .replace(/ッ/g, 'tsu');
   };
+
+  function hanToRoman(str){
+    return convertKanaIntoRoman(hankanaToZenkana(str));
+  }
+
+  function createUL(list){
+    var newUL = document.createElement("ul");
+    for (var i = 0; i < list.length; i++){
+      var li = document.createElement("li");
+      li.textContent = list[i];
+      newUL.appendChild(li);
+    }
+    return newUL;
+  }
 
   function processFile(url, fCallback, var_args){
     function xhrSuccess(){
@@ -118,10 +119,6 @@ searchCities.exec = function(outputArea, opt_input){
       return result;
   }
 
-  function han2Roman(str){
-    return convertKanaIntoRoman(hankana2zenkana(str));
-  }
-
   function appendHitNames(outputArea){
     myKen = /ken$/m;
     myCity = /si$/m;
@@ -129,8 +126,8 @@ searchCities.exec = function(outputArea, opt_input){
     for (var i = 0; i < nameArray.length; i++){
       tmp = new String(nameArray[i][3]); //ken
       tmp2 = new String(nameArray[i][4]); //city
-      tmp = han2Roman(tmp);
-      tmp2 = han2Roman(tmp2);
+      tmp = hanToRoman(tmp);
+      tmp2 = hanToRoman(tmp2);
       if (myKen.test(tmp)) {
         console.error(tmp);
         nameArray[i].push(tmp[0].toUpperCase() + '県');
@@ -140,7 +137,7 @@ searchCities.exec = function(outputArea, opt_input){
         nameArray[i].push(tmp2[0].toUpperCase() + '市');
       }
       nameArray[i][3] = tmp;
-      nameArray[i][4] = han2Roman(tmp2);
+      nameArray[i][4] = hanToRoman(tmp2);
     }
     var newUL = createUL(nameArray);
     outputArea.appendChild(newUL);
@@ -149,13 +146,13 @@ searchCities.exec = function(outputArea, opt_input){
   var FILE_INDEX = 'japanese-city-name.csv';
   processFile(FILE_INDEX, appendHitNames, outputArea);
 
-  testChar = convertKanaIntoRoman(hankana2zenkana('ﾋﾞﾎﾛﾁｮｳ'));
+  testChar = convertKanaIntoRoman(hankanaToZenkana('ﾋﾞﾎﾛﾁｮｳ'));
   window.alert(testChar);
   console.error(outputArea);
   var pTag = document.createElement('P');
   console.error(pTag);
   console.error(opt_input.value);
-  pTag.textContent = convertKanaIntoRoman(hankana2zenkana(opt_input.value));
+  pTag.textContent = convertKanaIntoRoman(hankanaToZenkana(opt_input.value));
   console.error(pTag);
   outputArea.appendChild(pTag);
 
